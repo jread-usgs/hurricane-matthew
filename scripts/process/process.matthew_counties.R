@@ -1,8 +1,8 @@
+epsg_code <- '+init=epsg:3082' 
 process.matthew_counties <- function(viz){
   library(rgeos)
-  states <- c("FL","GA","SC","NC")
-  
-  epsg_code <- '+init=epsg:3086' 
+  states <- c("TX")
+
   counties <- readData(viz[['depends']])
   counties <- counties[counties$STATE %in% states, ]
   FIPs <- as.character(counties$FIPS)
@@ -16,11 +16,10 @@ process.matthew_counties <- function(viz){
 
 process.matthew_states <- function(viz){
   library(rgeos)
-  skip.states <- c("Florida","Georgia","South Carolina","North Carolina")
+  use.states <- c("Wisconsin")
   
-  epsg_code <- '+init=epsg:3086' 
   states <- readData(viz[['depends']])
-  states <- states[!states$STATE %in% skip.states, ]
+  states <- states[states$STATE %in% use.states, ] # just don't plot anything...
   states <- rgeos::gSimplify(states, 0.01)
   states <- spTransform(states, CRS(epsg_code))
   
@@ -29,9 +28,7 @@ process.matthew_states <- function(viz){
 
 process.matthew_stateborders <- function(viz){
   library(rgeos)
-  include.states <- c("Florida","Georgia","South Carolina","North Carolina")
-  
-  epsg_code <- '+init=epsg:3086' 
+  include.states <- c("Texas")
   states <- readData(viz[['depends']])
   states <- states[states$STATE %in% include.states, ]
   states <- rgeos::gSimplify(states, 0.01)
@@ -134,12 +131,12 @@ process.storm_location <- function(viz){
   unzip('cache/matthew.zip', exdir = shp.path)
   
   as.time <- function(YEAR, MONTH, DAY, HHMM){
-    as.POSIXct(sprintf('%s-%s-%s %s', YEAR, MONTH, DAY, HHMM), format='%Y-%b-%d %H%M', tz="America/New_York")
+    as.POSIXct(sprintf('%s-%s-%s %s', YEAR, MONTH, DAY, HHMM), format='%Y-%m-%d %H%M', tz="America/New_York")
   }
   
-  dbf.file <- file.path(shp.path, 'al142016_pts.dbf')
+  dbf.file <- file.path(shp.path, 'AL092017_pts.dbf')
   shp.data <- foreign::read.dbf(dbf.file) %>% 
-    filter(STORMNAME=="MATTHEW") %>% 
+    filter(STORMNAME=="HARVEY") %>% 
     mutate(DateTime = as.time(YEAR, MONTH, DAY, HHMM)) %>% 
     select(LAT, LON, DateTime, INTENSITY)
   

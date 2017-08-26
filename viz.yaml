@@ -77,8 +77,8 @@ fetch:
     id: matthew-track
     location: cache/matthew.zip
     ocean: al
-    stormnum: 14
-    year: 2016
+    stormnum: 09
+    year: 2017
     reader: shp
     fetcher: hurricaneTrack
     scripts: scripts/fetch/hurricaneTrack.R
@@ -87,21 +87,10 @@ fetch:
     metadata: "Updates every 6 hours on http://www.nhc.noaa.gov/gis/"
     comment: disabling refetch until timestamp is hooked up
   -
-    id: flowlines
-    fetcher: flowlines
-    scripts: scripts/fetch/fetch.flowlines.R
-    location: cache/nhdflowline_network.zip
-    mapRange: [-100, -75.432129, 24.994771,40]
-    streamorder: 6
-    reader: shp
-    mimetype: application/zip
-    refetch: false
-    comment: disabling refetch for now, delete cache to update
-  -
     id: precip-data
     fetcher: precip
-    start.date: "2016-10-6"
-    end.date: "2016-10-13"
+    start.date: "2017-08-25"
+    end.date: "2017-08-27"
     scripts: scripts/fetch/fetchPrecip.R
     location: cache/precip.csv
     mimetype: text/csv
@@ -121,8 +110,8 @@ fetch:
     fetcher: sites
     scripts: scripts/fetch/fetch.sites.R
     location: cache/sites.rds
-    start.date: "2016-10-6"
-    states: ["FL","SC","NC","GA"]
+    start.date: "2017-08-25"
+    states: ["TX","LA"]
     reader: rds
     refetch: FALSE
     comment: disabling refetch for now, re-enable to get updates to work
@@ -149,13 +138,6 @@ process:
     reader: rds
     depends: "states"
   -
-    id: matthew-flowlines
-    location: cache/matthew-flowlines.rds
-    processor: flowlines
-    scripts: scripts/process/process.flowlines.R
-    reader: rds
-    depends: ["flowlines","matthew-counties"]
-  -
     id: storm-track
     location: cache/storm-track.rds
     processor: matthew_track
@@ -166,8 +148,8 @@ process:
     id: storm-location
     location: cache/storm-location.rds
     processor: storm_location
-    start.date: "2016-10-6"
-    end.date: "2016-10-13"
+    start.date: "2017-08-25"
+    end.date: "2017-08-26"
     reader: rds
     depends: ["matthew-track", "matthew-counties"]  
   -
@@ -226,7 +208,7 @@ visualize:
     id: matthew-map
     location: figures/matthew-water.svg
     visualizer: matthew_map
-    depends: ["matthew-counties","matthew-flowlines", "matthew-states", "storm-track", "classifyBins", 
+    depends: ["matthew-counties","matthew-states", "storm-track", "classifyBins", 
       'storm-location',"matthew-sites", "precip-colors", "precip-breaks", "discharge-sparks","matthew-borders"]
     scripts: scripts/visualize/visualize.matthew_map.R
     mapdata: "matthew-counties"
@@ -280,15 +262,15 @@ publish:
   -
     id: matthew-page
     name: index
-    template: fullPage
+    template: "/Library/Frameworks/R.framework/Versions/3.4/Resources/library/vizlab/templates/fullPage.mustache"
     publisher: page
     depends: ["header-section", "figure-section", "data-sources", "map-figure-css", 
       "header-footer-css", "precip-colors", "timesteps", "jquery-js", "animate-js",
-      "svg-css","thumbnail", "vizlab-favicon", "footer-section"]
+      "svg-css","thumbnail", "vizlab-favicon"]
     context:
       resources: ["map-figure-css","header-footer-css", "jquery-js", "animate-js", "svg-css",
         "<link rel=\"icon\" type=\"image/ico\" href=\"images/favicon.ico\"/>"]
-      sections: [ "header-section", "figure-section", "data-sources", "footer-section" ]
+      sections: [ "header-section", "figure-section", "data-sources"]
   -
     id: figure-section
     template: layout/templates/mapFigure.mustache
@@ -340,28 +322,7 @@ publish:
       line7: "Storm Track: National Oceanic and Atmospheric Administration National Hurricane Center Preliminary Best Track for Hurricane Matthew ("
       nhcLink: http://www.nhc.noaa.gov/gis/
       line8: )
-  -
-    id: footer-section
-    template: footer
-    publisher: footer
-    depends: [ "header-footer-css", "vizlab-logo" ]
-    context:
-      logo: vizlab-logo
-    blogsInFooter: TRUE
-    vizzies:
-      - name: Microplastics in the Great Lakes
-        org: USGS-VIZLAB
-        repo: great-lakes-microplastics
-      - name: Climate Change and Freshwater Fish
-        org: USGS-VIZLAB
-        repo: climate-fish-habitat
-    blogs: 
-      - name: Using the dataRetrieval Stats Service
-        url: https://owi.usgs.gov/blog/stats-service-map/
-        thumbLoc: https://owi.usgs.gov/blog/static/stats-service-map/plot-1.png
-      - name: Visualizing Tropical Storm Colin Precipitation using geoknife
-        url: https://owi.usgs.gov/blog/ts-colin-precip/
-        thumbLoc: https://owi.usgs.gov/blog/static/ts-colin-precip/use-functions-1.png
+  
   -
     id: svg-css
     location: layout/css/matthew-svg.css

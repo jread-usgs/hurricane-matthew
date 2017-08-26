@@ -6,17 +6,11 @@ fetch.precip <- function(viz){
   
   getPrecip <- function(states, startDate, endDate){
     
-    wg_s <- webgeom(geom = 'derivative:US_Counties', attribute = 'STATE')
-    wg_c <- webgeom(geom = 'derivative:US_Counties', attribute = 'COUNTY')
-    wg_f <- webgeom(geom = 'derivative:US_Counties', attribute = 'FIPS')
-    county_info <- data.frame(state = query(wg_s, 'values'), county = query(wg_c, 'values'), 
-                              fips = query(wg_f, 'values'), stringsAsFactors = FALSE) %>% 
-      unique() 
-    
-    counties_fips <- county_info %>% filter(state %in% states) %>%
-      mutate(state_fullname = tolower(state.name[match(state, state.abb)])) %>%
-      mutate(county_mapname = paste(state_fullname, tolower(county), sep=",")) %>%
-      mutate(county_mapname = unlist(strsplit(county_mapname, split = " county")))
+    counties_fips <- maps::county.fips %>% 
+      mutate(statecounty=as.character(polyname)) %>% # character to split into state & county
+      tidyr::separate(polyname, c('statename', 'county'), ',') %>%
+      mutate(fips = sprintf('%05d', fips)) %>% # fips need 5 digits to join w/ geoknife result
+      filter(statename %in% states) 
     
     stencil <- webgeom(geom = 'derivative:US_Counties',
                        attribute = 'FIPS',
@@ -45,7 +39,7 @@ fetch.precip <- function(viz){
   endDate <- as.POSIXct(paste(viz[["end.date"]],"22:00:00"), tz="America/New_York")
   attr(startDate, 'tzone') <- "UTC"
   
-  states <- c("FL","GA","SC","NC")
+  states <- c("TX","LA")
   
   precip <- getPrecip(states, startDate, endDate)
   attr(precip$DateTime, 'tzone') <- "America/New_York" #back to eastern

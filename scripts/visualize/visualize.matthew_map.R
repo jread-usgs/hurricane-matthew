@@ -5,23 +5,22 @@
 visualize.matthew_map <- function(viz){
   
   counties <- readData(viz[['depends']][1])
-  flowlines <- readData(viz[['depends']][2])
-  states <- readData(viz[['depends']][3])
-  track <- readData(viz[['depends']][4])
-  col.bins <- readData(viz[['depends']][5])
-  storm <- readData(viz[['depends']][6])
-  gages <- readData(viz[['depends']][7])
-  legend.bins <- readData(viz[['depends']][8])
-  legend.breaks <- readData(viz[['depends']][9])
-  spark.sites <- readData(viz[['depends']][10])
-  state.borders <- readData(viz[['depends']][11])
+  states <- readData(viz[['depends']][2])
+  track <- readData(viz[['depends']][3])
+  col.bins <- readData(viz[['depends']][4])
+  storm <- readData(viz[['depends']][5])
+  gages <- readData(viz[['depends']][6])
+  legend.bins <- readData(viz[['depends']][7])
+  legend.breaks <- readData(viz[['depends']][8])
+  spark.sites <- readData(viz[['depends']][9])
+  state.borders <- readData(viz[['depends']][10])
   library(svglite)
   library(dplyr)
   
   svglite::svglite(viz[['location']])
   par(mai=c(0,0,0,0), omi=c(0,0,0,0))
   sp::plot(counties)
-  sp::plot(flowlines, add=TRUE)
+  #sp::plot(flowlines, add=TRUE)
   sp::plot(state.borders, add=TRUE)
   sp::plot(states, add=TRUE)
   sp::plot(track, add=TRUE)
@@ -76,7 +75,7 @@ visualize.matthew_map <- function(viz){
   g.legend <- xml_add_child(svg, 'g', id='precip-legend','class'='legend', transform='translate(155,353)scale(0.8)')
   g.watermark <- xml_add_child(svg, 'g', id='usgs-watermark',transform=sprintf('translate(2,%s)scale(0.25)', as.character(as.numeric(vb[4])-40)))
   g.borders <- xml_add_child(svg, 'g', id='focus-borders') # on top
-  g.rivers <- xml_add_child(svg, 'g', id='rivers','class'='river-polyline')
+  #g.rivers <- xml_add_child(svg, 'g', id='rivers','class'='river-polyline')
   
   rmv.i <- c()
   for (j in (i+1):(i+length(state.borders))){
@@ -96,9 +95,9 @@ visualize.matthew_map <- function(viz){
   for (i in (length(pl)+1 - length(track)): length(pl)){
     xml_add_child(g.track, 'polyline', points = xml_attr(pl[i], 'points'))
   }
-  for (i in 1:(length(pl)- length(track))){
-    xml_add_child(g.rivers, 'polyline', points = xml_attr(pl[i], 'points'), 'clip-path'="url(#svg-bounds)")
-  }
+  # for (i in 1:(length(pl)- length(track))){
+  #   xml_add_child(g.rivers, 'polyline', points = xml_attr(pl[i], 'points'), 'clip-path'="url(#svg-bounds)")
+  # }
   
   
   cnt = 0; # count how many actually have data
