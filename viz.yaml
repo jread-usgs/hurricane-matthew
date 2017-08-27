@@ -63,7 +63,7 @@ fetch:
     reader: shp
     fetcher: counties
     scripts: scripts/fetch/fetch.counties.R
-    refetch: false
+    refetch: FALSE
     mimetype: application/zip
   -
     id: states
@@ -71,7 +71,7 @@ fetch:
     reader: shp
     fetcher: states
     scripts: scripts/fetch/fetch.counties.R
-    refetch: false
+    refetch: FALSE
     mimetype: application/zip
   -
     id: site_footy
@@ -79,7 +79,6 @@ fetch:
     reader: shp
     fetcher: site_footy
     scripts: scripts/fetch/fetch.counties.R
-    refetch: false
     mimetype: application/zip
   -
     id: matthew-track
@@ -91,7 +90,7 @@ fetch:
     fetcher: hurricaneTrack
     scripts: scripts/fetch/hurricaneTrack.R
     mimetype: application/zip
-    refetch: true
+    refetch: TRUE
     metadata: "Updates every 6 hours on http://www.nhc.noaa.gov/gis/"
     comment: disabling refetch until timestamp is hooked up
   -
@@ -130,7 +129,6 @@ process:
     processor: matthew_counties
     scripts: scripts/process/process.matthew_counties.R
     reader: rds
-    bbox: [1398072, 5803087, 2118072, 6454087]
     depends: "counties"
   -
     id: matthew-states
@@ -185,6 +183,7 @@ process:
     scripts: scripts/process/process.classifyBins.R
     reader: rds
     depends: ["precip-breaks", "precip-data"]
+  
   - id: discharge-sparks
     location: cache/discharge-sparks.rds
     processor: discharge_sparks
