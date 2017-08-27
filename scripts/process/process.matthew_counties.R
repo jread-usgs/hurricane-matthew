@@ -1,10 +1,5 @@
 epsg_code <- '+init=epsg:3082' 
 
-gClip <- function(shp, bb){
-  if(class(bb) == "matrix") b_poly <- as(raster::extent(as.vector(t(bb))), "SpatialPolygons")
-  else b_poly <- as(raster::extent(bb), "SpatialPolygons")
-  gIntersection(shp, b_poly, byid = T)
-}
 
 process.matthew_counties <- function(viz){
   library(rgeos)
@@ -16,15 +11,7 @@ process.matthew_counties <- function(viz){
   countyName <- paste0(as.character(counties$COUNTY),', ', as.character(counties$STATE))
   counties <- rgeos::gSimplify(counties, 0.001)
   counties <- spTransform(counties, CRS(epsg_code))
-  b <- bbox(counties)
-  b[1, 1] <- viz[['bbox']][[1]]
-  b[2, 1] <- viz[['bbox']][[2]]
-  b[1, 2] <- viz[['bbox']][[3]]
-  b[2, 2] <- viz[['bbox']][[4]]
-  b <- bbox(t(b))
-  counties <- gClip(counties, b)
-  message('hack so we can work on this')
-  counties <- SpatialPolygonsDataFrame(counties, data = data.frame(FIPS=FIPs[1:length(counties)], countyName = countyName[1:length(counties)]), match.ID = FALSE)
+  counties <- SpatialPolygonsDataFrame(counties, data = data.frame(FIPS=FIPs, countyName = countyName), match.ID = FALSE)
   saveRDS(counties, viz[['location']])
 }
 
@@ -75,17 +62,7 @@ process.matthew_sites <- function(viz){
   library(rgeos)
   library(sp)
   library(dplyr)
-  ignore.sites <- c('02171645','02135200','02240000','02274325',
-                    '02236500','02133624','02134500','02135000',
-                    '021989773','02226160','02134170','02236000',
-                    '02236000','02231600','02134480','02132320',
-                    '02232000','02274505','02130910','02084160',
-                    '02105500','02313100','02273230','02273230',
-                    '02270500','02312598','02148000','02168504',
-                    '02148000','02314500','02312667','02312720',
-                    '02257000','02322500','0204382800','02105769','02091814', 
-                    '02312675','02312700','02274490',
-                    '02256500') # sites that hydropeak or are otherwise not representative
+  ignore.sites <- c('08041780', '08211503') # sites that hydropeak or are otherwise not representative
   counties <- readData(viz[['depends']][2])
   sites <- readData(viz[['depends']][1]) %>% 
     filter(!site_no %in% ignore.sites) %>% 
@@ -130,7 +107,7 @@ process.discharge_sparks <- function(viz){
   interp_q <- function(x,y){
     approx(x, y, xout = times)$y %>% grab_spark
   }
-  sparks <- group_by(disch, site_no) %>% 
+  sparks <- group_by(disch, site_no) %>% filter(min(dateTime) <= times[2], max(dateTime) >= tail(times, 2L)[2]) %>% 
     summarize(points = interp_q(dateTime, Flow_Inst))
   saveRDS(sparks, viz[['location']])
 }
