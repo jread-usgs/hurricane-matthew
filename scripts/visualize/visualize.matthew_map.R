@@ -18,8 +18,8 @@ visualize.matthew_map <- function(viz){
   library(dplyr)
   
   svglite::svglite(viz[['location']])
-  par(mai=c(0,0,0,0), omi=c(0,0,0,0))
-  sp::plot(counties, expandBB = c(0,0.02,0,0.2))
+  par(mai=c(0,0,0,0), omi=c(0,0,0,0), xaxs = 'i', yaxs = 'i')
+  sp::plot(counties)#, setParUsrBB = TRUE)#, expandBB = c(0,0.02,0,0.2))
   #sp::plot(flowlines, add=TRUE)
   sp::plot(state.borders, add=TRUE)
   sp::plot(states, add=TRUE)

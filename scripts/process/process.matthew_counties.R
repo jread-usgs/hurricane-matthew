@@ -1,4 +1,11 @@
 epsg_code <- '+init=epsg:3082' 
+
+gClip <- function(shp, bb){
+  if(class(bb) == "matrix") b_poly <- as(raster::extent(as.vector(t(bb))), "SpatialPolygons")
+  else b_poly <- as(raster::extent(bb), "SpatialPolygons")
+  gIntersection(shp, b_poly, byid = T)
+}
+
 process.matthew_counties <- function(viz){
   library(rgeos)
   states <- c("TX")
@@ -9,10 +16,20 @@ process.matthew_counties <- function(viz){
   countyName <- paste0(as.character(counties$COUNTY),', ', as.character(counties$STATE))
   counties <- rgeos::gSimplify(counties, 0.001)
   counties <- spTransform(counties, CRS(epsg_code))
-  counties <- SpatialPolygonsDataFrame(counties, data = data.frame(FIPS=FIPs, countyName = countyName), match.ID = FALSE)
-  
+  b <- bbox(counties)
+  b[1, 1] <- viz[['bbox']][[1]]
+  b[2, 1] <- viz[['bbox']][[2]]
+  b[1, 2] <- viz[['bbox']][[3]]
+  b[2, 2] <- viz[['bbox']][[4]]
+  b <- bbox(t(b))
+  counties <- gClip(counties, b)
+  message('hack so we can work on this')
+  counties <- SpatialPolygonsDataFrame(counties, data = data.frame(FIPS=FIPs[1:length(counties)], countyName = countyName[1:length(counties)]), match.ID = FALSE)
   saveRDS(counties, viz[['location']])
 }
+
+
+
 
 process.matthew_states <- function(viz){
   library(rgeos)
@@ -73,13 +90,13 @@ process.matthew_sites <- function(viz){
   sites <- readData(viz[['depends']][1]) %>% 
     filter(!site_no %in% ignore.sites) %>% 
     arrange(desc(dec_lat_va))
-  track <- readData(viz[['depends']][3])
-  buffered.track <- gBuffer( track, width=200000, byid=TRUE )
+  footy <- readData(viz[['depends']][3]) %>% spTransform(CRS(proj4string(counties))) %>% 
+    gBuffer(width=20000, byid=TRUE )
   pts <- cbind(sites$dec_long_va, sites$dec_lat_va)
   sites <- SpatialPointsDataFrame(pts, proj4string=CRS("+proj=longlat +datum=WGS84"), 
                                      data = sites %>% select(site_no, station_nm) %>% data.frame)
   sites <- spTransform(sites, CRS(proj4string(counties)))
-  overlap <- gContains(buffered.track, sites, byid = TRUE) %>% rowSums() %>% as.logical()
+  overlap <- gContains(footy, sites, byid = TRUE) %>% rowSums() %>% as.logical()
   
   # here do "over" analysis for masking?
   

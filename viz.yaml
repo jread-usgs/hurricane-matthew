@@ -74,6 +74,14 @@ fetch:
     refetch: false
     mimetype: application/zip
   -
+    id: site_footy
+    location: cache/Harvey_footy.zip
+    reader: shp
+    fetcher: site_footy
+    scripts: scripts/fetch/fetch.counties.R
+    refetch: false
+    mimetype: application/zip
+  -
     id: matthew-track
     location: cache/matthew.zip
     ocean: al
@@ -122,6 +130,7 @@ process:
     processor: matthew_counties
     scripts: scripts/process/process.matthew_counties.R
     reader: rds
+    bbox: [1398072, 5803087, 2118072, 6454087]
     depends: "counties"
   -
     id: matthew-states
@@ -188,7 +197,7 @@ process:
     processor: matthew_sites
     scripts: scripts/process/process.matthew_counties.R
     reader: rds
-    depends: ["sites-data","matthew-counties", "storm-track"]
+    depends: ["sites-data","matthew-counties", "site_footy"]
   -
     id: timesteps
     location: cache/times.json
