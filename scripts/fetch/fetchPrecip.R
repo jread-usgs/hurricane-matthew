@@ -14,21 +14,19 @@ fetch.precip <- function(viz){
     
     stencil <- webgeom(geom = 'derivative:US_Counties',
                        attribute = 'FIPS',
-                       values = counties_fips$fips)
+                       values = unique(counties_fips$fips))
     
-    fabric <- webdata(url = 'http://cida.usgs.gov/thredds/dodsC/stageiv_combined', 
+    fabric <- webdata(url = 'https://cida.usgs.gov/thredds/dodsC/stageiv_combined', 
                       variables = "Total_precipitation_surface_1_Hour_Accumulation", 
                       times = c(startDate, endDate))
     
     job <- geoknife(stencil, fabric, wait = TRUE, REQUIRE_FULL_COVERAGE=FALSE)
     check(job)
-    precipData <- result(job, with.units=TRUE)
-    precipData2 <- precipData %>% 
+    precipData <- result(job, with.units=TRUE) %>% 
       select(-variable, -statistic, -units) %>% 
-      gather(key = fips, value = precipVal, -DateTime) %>% 
-      left_join(counties_fips, by="fips")
+      gather(key = fips, value = precipVal, -DateTime) 
     
-    return(precipData2)
+    return(precipData)
   }
   
   library(dplyr)
@@ -39,7 +37,7 @@ fetch.precip <- function(viz){
   endDate <- as.POSIXct(paste(viz[["end.date"]],"22:00:00"), tz="America/New_York")
   attr(startDate, 'tzone') <- "UTC"
   
-  states <- c("TX","LA")
+  states <- c("texas")
   
   precip <- getPrecip(states, startDate, endDate)
   attr(precip$DateTime, 'tzone') <- "America/New_York" #back to eastern
