@@ -39,13 +39,13 @@ line, polyline, path{
   stroke: #c6c6c6;
   stroke-width:0.5;
 }
-.county-polygon:hover, .state-polygon:hover { 
+.county-polygon:hover { 
   stroke: #ffffff;
   fill-opacity: 0.92;
   }
 .state-polygon {
-  fill: #E8E8E8;
-  stroke: #c6c6c6;
+  fill: #737373;
+  stroke: #5f5f5f;
   stroke-width:0.5;
 }
 .background {

@@ -83,7 +83,7 @@ fetch:
     fetcher: hurricaneTrack
     scripts: scripts/fetch/hurricaneTrack.R
     mimetype: application/zip
-    refetch: false
+    refetch: true
     metadata: "Updates every 6 hours on http://www.nhc.noaa.gov/gis/"
     comment: disabling refetch until timestamp is hooked up
   -
@@ -113,7 +113,7 @@ fetch:
     start.date: "2017-08-25"
     states: ["TX"]
     reader: rds
-    refetch: FALSE
+    refetch: TRUE
     comment: disabling refetch for now, re-enable to get updates to work
 process:
   -

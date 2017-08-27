@@ -16,10 +16,10 @@ process.matthew_counties <- function(viz){
 
 process.matthew_states <- function(viz){
   library(rgeos)
-  use.states <- c("Wisconsin")
+  use.states <- c("Texas")
   
   states <- readData(viz[['depends']])
-  states <- states[states$STATE %in% use.states, ] # just don't plot anything...
+  states <- states[!states$STATE %in% use.states, ] 
   states <- rgeos::gSimplify(states, 0.01)
   states <- spTransform(states, CRS(epsg_code))
   
