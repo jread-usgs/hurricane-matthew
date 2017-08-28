@@ -67,8 +67,8 @@ fetch:
     mimetype: application/zip
   -
     id: states
-    location: cache/states.zip
-    reader: shp
+    location: cache/states.rds
+    reader: rds
     fetcher: states
     scripts: scripts/fetch/fetch.counties.R
     refetch: FALSE

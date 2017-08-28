@@ -20,21 +20,23 @@ process.matthew_counties <- function(viz){
 
 process.matthew_states <- function(viz){
   library(rgeos)
-  use.states <- c("Texas")
+  library(sp)
+  use.states <- c("texas")
   
   states <- readData(viz[['depends']])
-  states <- states[!states$STATE %in% use.states, ] 
+  states <- states[!names(states) %in% use.states, ] 
   states <- rgeos::gSimplify(states, 0.01)
-  states <- spTransform(states, CRS(epsg_code))
+  states <- sp::spTransform(states, CRS(epsg_code))
   
   saveRDS(states, viz[['location']])
 }
 
 process.matthew_stateborders <- function(viz){
   library(rgeos)
-  include.states <- c("Texas")
+  library(sp)
+  include.states <- c("texas")
   states <- readData(viz[['depends']])
-  states <- states[states$STATE %in% include.states, ]
+  states <- states[names(states) %in% include.states, ]
   states <- rgeos::gSimplify(states, 0.01)
   states <- spTransform(states, CRS(epsg_code))
   
@@ -62,7 +64,7 @@ process.matthew_sites <- function(viz){
   library(rgeos)
   library(sp)
   library(dplyr)
-  ignore.sites <- c('08041780', '08211503') # sites that hydropeak or are otherwise not representative
+  ignore.sites <- c('08041780', '08211503', '08028500') # sites that hydropeak or are otherwise not representative
   counties <- readData(viz[['depends']][2])
   sites <- readData(viz[['depends']][1]) %>% 
     filter(!site_no %in% ignore.sites) %>% 
